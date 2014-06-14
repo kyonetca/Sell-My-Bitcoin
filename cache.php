@@ -70,6 +70,7 @@ $output = array();
 $output['price'] = $mount;
 $output['rate']['usd'] = $usd_rate;
 $output['rate']['cny'] = $cny_rate;
+$output['time'] = time();
 
 //write the result to cache file:
 $fh = fopen('./data.json', 'w');

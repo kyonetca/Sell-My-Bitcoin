@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>BTC報價</title>
+  <script src="static/js/vendor/jquery-2.1.1.min.js"></script>
+  <script src="static/js/vendor/jquery.cookie.js"></script>
+  <script><!--
+    $.getJSON('data.json', function(data){
+      console.log(data);
+      $('#usd2twd').val(data.rate.usd);
+      $('#cny2twd').val(data.rate.cny);
+      $('#btc2sell').val(data.price.sell);
+      $('#btc2buy').val(data.price.buy);
+    });
+  --></script>
+</head>
+<body>
+  <div id="currency">
+    目前法幣匯率：
+    USD:TWD = <input id="usd2twd" type="text" disabled>
+    CNY:TWD = <input id="cny2twd" type="text" disabled>
+  </div>
+  <div id="btc">
+    目前出售價：
+    <input id="btc2sell" type="text" disabled>NTD/&#xE3F;
+    目前收購價：
+    <input id="btc2buy" type="text" disabled>NTD/&#xE3F;
+  </div>
+  本頁更新時間：<p id="time"></p>
+</body>
+</html>
