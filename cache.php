@@ -67,7 +67,7 @@ $mount['sell'] = $totalSell / $totalMount;
 
 //Set up the array for output.
 $output = array();
-$output['price'] = $mount;
+$output['price'] = $mount * 1.08;
 $output['rate']['usd'] = $usd_rate;
 $output['rate']['cny'] = $cny_rate;
 $output['time'] = time();

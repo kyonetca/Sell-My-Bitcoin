@@ -6,6 +6,7 @@
   <script src="static/js/vendor/jquery-2.1.1.min.js"></script>
   <script src="static/js/vendor/jquery.cookie.js"></script>
   <script><!--
+  function refresh(){
     $.getJSON('data.json', function(data){
       console.log(data);
       $('#usd2twd').val(data.rate.usd);
@@ -13,6 +14,8 @@
       $('#btc2sell').val(data.price.sell);
       $('#btc2buy').val(data.price.buy);
     });
+  }
+  setTimeout('refresh()', 5000);
   --></script>
 </head>
 <body>
