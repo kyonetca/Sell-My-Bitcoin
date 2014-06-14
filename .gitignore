@@ -1,0 +1,4 @@
+*.php ident
+*.js ident
+*.css ident
+*.sass ident
