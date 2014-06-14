@@ -24,36 +24,46 @@ $bitstamp_return = runCurl(BITSTAMP_API, true);
        $usd_rate = explode(',', runCurl(YAHOO_USD_RATE))[1];
        $cny_rate = explode(',', runCurl(YAHOO_CNY_RATE))[1];
 
+$weighted = array();
 
 //注意火幣網為人民幣價錢。
 $huobi = array('buy' => convert($huobi_return['buys'][0], $cny_rate),
               'sell' => convert($huobi_return['sells'][0], $cny_rate),
             'amount' => $huobi_return['amount'][0]);
 
+$weighted['huobi']['buy'] = $huobi['buy'] * $huobi['amount'];
+$weighted['huobi']['sell'] = $huobi['sell'] * $huobi['amount'];
+
 $btce = array('buy' => convert($btce_return['btc_usd']['buy'], $usd_rate),
              'sell' => convert($btce_return['btc_usd']['sell'], $usd_rate),
            'amount' => $btce_return['btc_usd']['vol']);
+
+$weighted['btce']['buy'] = $btce['buy'] * $btce['amount'];
+$weighted['btce']['sell'] = $btce['sell'] * $btce['amount'];
 
 $ok = array('buy' => convert($ok_return['ticker']['buy'], $cny_rate),
            'sell' => convert($ok_return['ticker']['sell'], $cny_rate),
          'amount' => $ok_return['ticker']['vol']);
 
-$bitstamp = array('buy' => $bitstamp_return['ticker']['bid'],
-                 'sell' => $bitstamp_return['ticker']['aks'],
-               'amount' => $bitstamp_return['ticker']['volume']);
+$weighted['ok']['buy'] = $ok['buy'] * $ok['amount'];
+$weighted['ok']['sell'] = $ok['sell'] * $ok['amount'];
+
+$bitstamp = array('buy' => $bitstamp_return['bid'],
+                 'sell' => $bitstamp_return['ask'],
+               'amount' => $bitstamp_return['volume']);
+
+
+$weighted['bitstamp']['buy'] = $bitstamp['buy'] * $bitstamp['amount'];
+$weighted['bitstamp']['sell'] = $bitstamp['sell'] * $bitstamp['amount'];
+
+$totalMount = $huobi['amount'] + $btce['amount'] + $ok['amount'] + $bitstamp['amount'];
+$totalBuy = $weighted['huobi']['buy'] + $weighted['btce']['buy'] + $weighted['ok']['buy'] + $weighted['bitstamp']['buy'];
+$totalSell = $weighted['huobi']['sell'] + $weighted['btce']['sell'] + $weighted['ok']['sell'] + $weighted['bitstamp']['sell'];
 
 //計算買一價加權平均值（注意價錢均已換臺幣）
 $mount = array();
-$mount['buy'] = ($huobi['buy'] * $huobi['amount']) +
-                 ($btce['buy'] * $btce['amount']) +
-                   ($ok['buy'] * $ok['amount']) +
-             ($bitstamp['buy'] * $bitstamp['amount']) /
-             ($huobi['amount'] + $btce['amount'] + $ok['amount'] + $bitstamp['amount']);
-$mount['sell'] = ($huobi['sell'] * $huobi['amount']) +
-                 ($btce['sell'] * $btce['amount']) +
-                   ($ok['sell'] * $ok['amount']) +
-             ($bitstamp['sell'] * $bitstamp['amount']) /
-             ($huobi['amount'] + $btce['amount'] + $ok['amount'] + $bitstamp['amount']);
+$mount['buy'] = $totalBuy / $totalMount;
+$mount['sell'] = $totalSell / $totalMount;
 
 function runCurl($url = '', $isJson = false) {
   $ch = curl_init();
@@ -66,12 +76,13 @@ function runCurl($url = '', $isJson = false) {
   curl_close($ch);
 
   if($isJson) {
-    return json_decode($output);
+    return json_decode($output, true);
   } else {
     return $output;
   }
 }
 
 function convert($value, $rate) {
-  return $value * $rate;
+  $result = (int)$value * (int)$rate;
+  return $result;
 }
