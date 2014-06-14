@@ -7,8 +7,8 @@
 
 if(file_exists('./data.json')){
   $data = json_decode(file_get_contents('./data.json'), true);
-  if($data['time'] - time() <= 5){
-    die($data);
+  if((time() - $data['time']) <= 5){
+    die(json_encode($data));
   }
 }
 
@@ -28,8 +28,10 @@ define('YAHOO_CNY_RATE', 'http://finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1
 $bitstamp_return = runCurl(BITSTAMP_API, true);
 //抓取美金與人民幣對臺幣之匯率
 //美金=>臺幣 = 美金×匯率
-       $usd_rate = explode(',', runCurl(YAHOO_USD_RATE))[1];
-       $cny_rate = explode(',', runCurl(YAHOO_CNY_RATE))[1];
+$usd_rate = explode(',', runCurl(YAHOO_USD_RATE));
+$usd_rate = $usd_rate[1];
+$cny_rate = explode(',', runCurl(YAHOO_CNY_RATE));
+$cny_rate = $cny_rate[1];
 
 $weighted = array();
 
@@ -74,13 +76,14 @@ $mount['sell'] = $totalSell / $totalMount;
 
 //Set up the array for output.
 $output = array();
-$output['price'] = $mount * 1.08;
+$output['price'] = $mount;
 $output['rate']['usd'] = $usd_rate;
 $output['rate']['cny'] = $cny_rate;
 $output['time'] = time();
 
 $fh = fopen('./data.json', 'w');
-fwrite($fh, json_encode($output));
+$output_text = json_encode($output);
+fwrite($fh, $output_text);
 
 function runCurl($url = '', $isJson = false) {
   $ch = curl_init();

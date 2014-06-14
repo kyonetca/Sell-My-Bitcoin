@@ -14,8 +14,9 @@
       $('#btc2sell').val(data.price.sell);
       $('#btc2buy').val(data.price.buy);
     });
+    setTimeout('refresh()', 5000);
   }
-  setTimeout('refresh()', 5000);
+  refresh();
   --></script>
 </head>
 <body>
