@@ -6,31 +6,104 @@
   <script src="static/js/vendor/jquery-2.1.1.min.js"></script>
   <script src="static/js/vendor/jquery.cookie.js"></script>
   <script><!--
-  function refresh(){
-    $.getJSON('cache.php', function(data){
-      console.log(data);
-      $('#usd2twd').val(data.rate.usd);
-      $('#cny2twd').val(data.rate.cny);
-      $('#btc2sell').val(data.price.sell);
-      $('#btc2buy').val(data.price.buy);
+    dataTime = new Date;
+       price = new Object;
+    function refresh(cache){
+      url = cache ? 'data.json' : 'cache.php';
+      $.getJSON(url, function(data){
+        console.log(data);
+        price = data;
+        dataTime.setTime(data.time * 1000);
+        $('#time').html(dataTime.toString());
+        $('#usd2twd').html(price.rate.usd);
+        $('#cny2twd').html(price.rate.cny);
+        updateValue('all');
+      });
+      setTimeout('refresh(false)', 5000);
+    }
+    function updateValue(pc){
+      switch(pc){
+        case 'btc2sell':
+          $('#ntd2sell').val($('#btc2sell').val() * price.price.sell);
+          break;
+        case 'ntd2sell':
+          $('#btc2sell').val($('#ntd2sell').val() / price.price.sell);
+          break;
+        case 'btc2buy':
+          $('#ntd2buy').val($('#btc2buy').val() * price.price.buy);
+          break;
+        case 'ntd2buy':
+          $('#btc2buy').val($('#ntd2buy').val() / price.price.buy);
+          break;
+        case 'all':
+          updateValue('btc2sell');
+          updateValue('btc2buy');
+          break;
+     }
+    }
+    $(document).ready(function(){
+      refresh(true);
+      $('input').bind('input', function(){ updateValue($(this).attr('id').toString().trim()); });
     });
-    setTimeout('refresh()', 5000);
-  }
-  refresh();
   --></script>
+  <link href="static/css/reset.css" rel="stylesheet">
+  <style>
+    *{
+      font-family: "WenQuanYi Micro Hei Nano", "Microsoft JhengHei", "Microsoft Ya Hei" !important; }
+    html{
+      color: #FFF;
+      background: url(./static/img/bg.png) no-repeat fixed center center / cover; }
+    .inline {
+      display: inline; }
+    #currency{
+      background: rgba(255, 255, 255, .3);
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 3em; }
+    #btc{
+      font-size: 4em;
+      text-align: center;
+      height: 50%;
+      margin-top: 25%; }
+    #buy, #sell{
+      margin: .4em 0; }
+    input{
+      border: 2px #777;
+      height: 1.2em;
+      font-size: 1em;
+      width: 6em;
+      border-radius: 10px; }
+    #currency, #currency p{
+      text-align: center;
+      line-height: 3em; }
+    #footer{
+      text-align: center;
+      background: rgba(255, 255, 255, .3);
+      padding-top: .5em;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 6em; }
+  </style>
 </head>
 <body>
   <div id="currency">
-    目前法幣匯率：
-    USD:TWD = <input id="usd2twd" type="text" disabled>
-    CNY:TWD = <input id="cny2twd" type="text" disabled>
+    USD:TWD = <p id="usd2twd" class="inline"></p>&nbsp;|&nbsp; 
+    CNY:TWD = <p id="cny2twd" class="inline"></p>
   </div>
   <div id="btc">
-    目前出售價：
-    <input id="btc2sell" type="text" disabled>NTD/&#xE3F;
-    目前收購價：
-    <input id="btc2buy" type="text" disabled>NTD/&#xE3F;
+    <div id="buy">
+      <p class="inline">買</p>
+      <input id="ntd2buy" type="text">NTD = <input id="btc2buy" type="text" value="1">&#xE3F;
+    </div>
+    <div id="sell">
+      <p class="inline">賣</p>
+      <input id="ntd2sell" type="text">NTD = <input id="btc2sell" type="text" value="1">&#xE3F;
+    </div>
   </div>
-  本頁更新時間：<p id="time"></p>
+  <div id="footer">
+    <p id="time" class="inline"></p>
+  </div>
 </body>
 </html>
