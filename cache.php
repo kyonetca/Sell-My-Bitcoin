@@ -65,6 +65,16 @@ $mount = array();
 $mount['buy'] = $totalBuy / $totalMount;
 $mount['sell'] = $totalSell / $totalMount;
 
+//Set up the array for output.
+$output = array();
+$output['price'] = $mount;
+$output['rate']['usd'] = $usd_rate;
+$output['rate']['cny'] = $cny_rate;
+
+//write the result to cache file:
+$fh = fopen('./data.json', 'w');
+fwrite($fh, json_encode($output));
+
 function runCurl($url = '', $isJson = false) {
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
