@@ -5,6 +5,13 @@
  * $Id$
  **/
 
+if(file_exists('./data.json')){
+  $data = json_decode(file_get_contents('./data.json'), true);
+  if($data['time'] - time() <= 5){
+    die($data);
+  }
+}
+
 //先設定各大網站的 API：
 //define(     'HUOBI_API', 'https://market.huobi.com/staticmarket/detail.html');
 define(     'HUOBI_API', 'https://market.huobi.com/staticmarket/detail_btc_json.js');
@@ -72,7 +79,6 @@ $output['rate']['usd'] = $usd_rate;
 $output['rate']['cny'] = $cny_rate;
 $output['time'] = time();
 
-//write the result to cache file:
 $fh = fopen('./data.json', 'w');
 fwrite($fh, json_encode($output));
 
